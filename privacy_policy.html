@@ -2,20 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TapRemember – Privacy Policy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — TapRemember</title>
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #222; line-height: 1.7; }
-    h1 { color: #1a1a1a; }
-    h2 { color: #333; margin-top: 2em; }
-    h3 { color: #444; }
-    p, li { color: #444; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      line-height: 1.7;
+      color: #333;
+    }
+    h1 { font-size: 1.8em; }
+    h2 { margin-top: 2em; font-size: 1.2em; }
+    h3 { font-size: 1em; margin-top: 1.5em; }
+    a { color: #1a73e8; }
+    ul { padding-left: 1.4em; }
   </style>
 </head>
 <body>
 
 <h1>Privacy Policy — TapRemember</h1>
-<p><strong>Last updated:</strong> March 12, 2026</p>
+
+<p><strong>Last updated:</strong> April 3, 2026</p>
 
 <p>TapRemember ("we", "our", or "the app") is a voice note application developed by Roberto Grosso (<a href="mailto:nuke.coba@gmail.com">nuke.coba@gmail.com</a>). This Privacy Policy explains what data we collect, how we use it, who we share it with, and your rights as a user. By using TapRemember, you agree to this policy.</p>
 
@@ -33,14 +42,21 @@
   <li><strong>Logged-in users:</strong> Notes are synced to Google Firebase Firestore, stored under a unique user ID. This enables cross-device sync.</li>
 </ul>
 
-<h3>Feedback (optional)</h3>
-<p>If you voluntarily submit feedback through the app, the text of your message is stored in Google Firebase Firestore. We use this solely to improve the app. No personal data is automatically attached to feedback unless you include it yourself.</p>
+<h3>Feedback (optional, logged-in users only)</h3>
+<p>The in-app feedback feature is available to signed-in users only. If you voluntarily submit feedback, the following data is stored in Google Firebase Firestore:</p>
+<ul>
+  <li>The text of your message, feedback type, and rating (if provided)</li>
+  <li>Your Firebase user ID (UID), used to prevent spam and improve response quality</li>
+  <li>A server-generated timestamp</li>
+  <li>Platform identifier ("android") and app version</li>
+</ul>
+<p>This data is used solely to improve the app. Guest users cannot submit feedback.</p>
 
 <h2>2. Data We Do NOT Collect</h2>
 <ul>
   <li>We do not collect location data</li>
   <li>We do not collect contacts, call logs, or SMS data</li>
-  <li>We do not use third-party advertising SDKs</li>
+  <li>We do not use advertising SDKs or behavioral analytics</li>
   <li>We do not sell or share your personal data with third parties for commercial purposes</li>
   <li>We do not track you across other apps or websites</li>
 </ul>
@@ -48,13 +64,14 @@
 <h2>3. Third Parties We Share Data With</h2>
 <p>We do not sell your data. We share limited data only with the following service providers, solely to operate the app:</p>
 <ul>
-  <li><strong>Google LLC (Firebase Authentication &amp; Firestore)</strong> — stores your account info and notes for logged-in users. Governed by the <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Privacy Policy</a>.</li>
+  <li><strong>Google LLC (Firebase Authentication &amp; Firestore)</strong> — stores your account info, notes, and feedback (for logged-in users). Governed by the <a href="https://firebase.google.com/support/privacy">Firebase Privacy Policy</a>.</li>
   <li><strong>Google LLC (Android Speech Recognition API)</strong> — processes voice input locally on device. No audio is sent to our servers.</li>
   <li><strong>Google LLC (Google Play Billing)</strong> — handles in-app purchases (Pro version). All payment data is managed exclusively by Google Play. We never receive or store payment details.</li>
 </ul>
 
 <h2>4. Data Retention</h2>
-<p>Notes stored in Firestore are retained until you delete them within the app or request account deletion. Guest data (localStorage) remains on your device until you clear the app's storage from Android settings. Feedback is retained indefinitely to help us improve the app but is not linked to identifiable user information.</p>
+<p>Notes stored in Firestore are retained until you delete them within the app or request account deletion. Guest data (localStorage) remains on your device until you clear the app's storage from Android settings.</p>
+<p>Feedback submitted through the app is retained indefinitely to help us improve it. Each feedback entry is associated with the sender's Firebase user ID. To request deletion of your feedback data, contact us at <a href="mailto:nuke.coba@gmail.com">nuke.coba@gmail.com</a>.</p>
 
 <h2>5. Security</h2>
 <p>We use Google Firebase, which applies industry-standard security measures to protect your data. Access to Firestore is controlled via Firebase Authentication and security rules that allow users to access only their own data.</p>
