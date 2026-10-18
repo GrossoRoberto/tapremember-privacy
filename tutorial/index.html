@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="it" data-lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Guida rapida di TapRemember: dettatura, parser, promemoria rapidi, tag, calendario, notifiche.">
+<title>TapRemember Tutorial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: tutorial a capitoli — testo a sinistra, telefono animato a destra; su mobile si impila. Dark-first come l'app. */
+:root{
+  --bg:#0b0d12; --surface:#12151c; --line:#232733; --fg:#e7eaf0; --muted:#8c95a8;
+  --accent:#C0F730; --accent-ink:#C0F730; --blue:#3b82f6;
+  --f-display:"Bricolage Grotesque", "Manrope", system-ui, sans-serif;
+  --f-body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+  /* colori dell'app (sempre scura nei mockup) */
+  --a-bg:#111318; --a-card:#1b1e25; --a-line:#2a2e38; --a-fg:#e2e8f0; --a-muted:#64748b;
+  --a-blue:#2563eb; --a-lime:#c4f53a; --a-green:#22c55e; --a-cal:#2fbf7f; --a-yellow:#eab308;
+  --a-red:#ef4444; --a-orange:#f59e0b; --a-cyan:#22d3ee; --a-pink:#f472b6;
+}
+@media (prefers-color-scheme: light){ :root:not([data-theme="dark"]){
+  --bg:#f4f5ef; --surface:#ffffff; --line:#dfe2d6; --fg:#14171d; --muted:#5a6272;
+  --accent-ink:#4a6600; --blue:#1d4ed8; color-scheme:light; } }
+:root[data-theme="light"]{ --bg:#f4f5ef; --surface:#ffffff; --line:#dfe2d6; --fg:#14171d; --muted:#5a6272;
+  --accent-ink:#4a6600; --blue:#1d4ed8; color-scheme:light; }
+
+html[data-lang="it"] [lang="en"], html[data-lang="en"] [lang="it"]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:1040px;margin:0 auto}
+a{color:var(--accent-ink)}
+:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px;border-radius:6px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line);margin:0 calc(-1 * max(16px, env(safe-area-inset-left, 0px)))}
+.top .wrap{display:flex;align-items:center;gap:12px;padding:10px max(16px, env(safe-area-inset-left, 0px))}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;white-space:nowrap}
+.brand img{width:26px;height:26px;border-radius:7px}
+.chips{display:flex;gap:6px;overflow-x:auto;flex:1;min-width:0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips a{flex:none;font-size:13px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted);text-decoration:none}
+.chips a:hover{color:var(--fg);border-color:var(--muted)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
+.lang button{all:unset;cursor:pointer;font:600 12px var(--f-mono);padding:5px 10px;color:var(--muted)}
+.lang button[aria-pressed="true"]{background:var(--accent);color:#14171d}
+
+/* hero */
+.hero{padding-block:56px 32px;display:grid;gap:18px}
+.hero img{width:72px;height:72px;border-radius:18px;box-shadow:0 0 0 1px var(--line)}
+.eyebrow{font:600 12px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,7vw,72px);line-height:1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent-ink)}
+.lede{font-size:19px;color:var(--muted);max-width:56ch;margin:0}
+.ver{font:12px var(--f-mono);color:var(--muted)}
+
+/* sections */
+section.ch{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:48px;align-items:center;
+  padding-block:56px;border-top:1px solid var(--line);scroll-margin-top:64px}
+section.ch.flip{grid-template-columns:300px minmax(0,1fr)}
+section.ch.flip .stage{order:-1}
+section.ch.text{grid-template-columns:minmax(0,1fr)}
+h2{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:6px 0 14px;text-wrap:balance;letter-spacing:-.01em}
+h3{font-size:15px;margin:22px 0 8px;font-weight:700}
+.copy{min-width:0;max-width:62ch}
+.copy p{margin:0 0 12px}
+.copy ul,.copy ol{margin:0 0 12px;padding-left:20px}
+.copy li{margin-bottom:6px}
+.say{font-family:var(--f-mono);font-size:14px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:2px 7px;white-space:nowrap}
+.tip{border-left:3px solid var(--accent);padding:4px 0 4px 14px;color:var(--muted);margin:16px 0}
+.kw{overflow-x:auto;margin:12px 0}
+.kw table{border-collapse:collapse;width:100%;min-width:460px;font-size:14px}
+.kw th,.kw td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.kw th{font:600 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.kw td:first-child{font-weight:700;white-space:nowrap}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:8px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.box h3{margin-top:0}
+.box p:last-child,.box ul:last-child,.box ol:last-child{margin-bottom:0}
+.price{font:800 28px var(--f-display);color:var(--accent-ink)}
+footer{border-top:1px solid var(--line);padding-block:32px 48px;color:var(--muted);font-size:14px}
+
+/* stage + phone */
+.stage{display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:270px;max-width:100%;height:568px;border-radius:40px;background:#050608;padding:9px;
+  box-shadow:0 0 0 1px #2b2f39, 0 30px 60px -20px rgba(0,0,0,.55)}
+.ctrl{all:unset;cursor:pointer;font:600 12px var(--f-mono);color:var(--muted);padding:6px 12px;border:1px solid var(--line);border-radius:999px}
+.ctrl:hover{color:var(--fg)}
+
+/* ===== app UI (mockup) ===== */
+.screen{position:relative;width:100%;height:100%;border-radius:31px;overflow:hidden;background:var(--a-bg);
+  color:var(--a-fg);font-family:var(--f-body);font-size:12.5px;line-height:1.35;user-select:none}
+.sb{position:absolute;top:0;left:0;right:0;height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:11px;font-weight:700;z-index:40;color:var(--a-fg)}
+.sb i{display:inline-block;width:18px;height:9px;border:1.5px solid currentColor;border-radius:3px;position:relative}
+.sb i::after{content:"";position:absolute;inset:1px 4px 1px 1px;background:currentColor;border-radius:1px}
+.nav{position:absolute;bottom:6px;left:50%;width:90px;height:4px;margin-left:-45px;border-radius:4px;background:#5b6070;z-index:40}
+.scr{position:absolute;inset:26px 0 0;padding:10px 14px 18px;opacity:0;visibility:hidden;transform:translateX(14px);transition:opacity .35s,transform .35s,visibility .35s}
+.scr.active{opacity:1;visibility:visible;transform:none}
+.x{opacity:0;visibility:hidden;transition:opacity .3s,transform .3s,visibility .3s;transform:translateY(6px)}
+.x.on{opacity:1;visibility:visible;transform:none}
+.collapse{display:none}.collapse.on{display:block}
+.mono{font-family:var(--f-mono)}
+.lbl{font:600 9.5px var(--f-mono);letter-spacing:.16em;color:var(--a-muted);margin:12px 0 6px;display:flex;justify-content:space-between;align-items:center}
+.lnk{font:600 11px var(--f-body);letter-spacing:0;color:var(--a-cal)}
+.hdr{display:flex;justify-content:flex-end;gap:8px;align-items:center}
+.pill{display:flex;align-items:center;gap:6px;border:1px solid var(--a-line);border-radius:999px;padding:6px 12px;font-size:11.5px}
+.sq{width:30px;height:30px;border-radius:9px;border:1px solid var(--a-line);display:grid;place-items:center;background:var(--a-card)}
+.ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.week{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:2px}
+.week b{font:600 9px var(--f-body);color:var(--a-muted)}
+.d{width:28px;height:28px;margin:auto;border-radius:50%;display:grid;place-items:center;font-size:11.5px;color:#cbd5e1}
+.d.today{box-shadow:inset 0 0 0 2px var(--a-blue)}
+.d.has{background:var(--a-cal);color:#0b1d14;font-weight:700}
+.d.pickd{box-shadow:0 0 0 2px var(--a-bg),0 0 0 4px #fff}
+ul.n{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+ul.n li{display:flex;gap:8px;align-items:flex-start;font-size:12.5px}
+ul.n li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--a-yellow);margin-top:5px;flex:none}
+ul.n li.hi::before{background:var(--a-red)}
+ul.n li.od{color:#f87171}
+ul.n li.od::before{background:var(--a-red)}
+ul.n li .dt{font-family:var(--f-mono);font-size:11px;color:var(--a-muted);margin-right:3px}
+ul.n li.od .dt{color:#f87171;font-weight:600}
+ul.n li .tg{color:var(--a-muted)}
+ul.n li.x{display:none}ul.n li.x.on{display:flex;animation:pop .6s}
+@keyframes pop{0%{background:rgba(196,245,58,.25);transform:translateX(-6px)}100%{background:transparent;transform:none}}
+ul.r{list-style:none;margin:0;padding:0;display:grid;gap:7px;color:#fcd98a}
+ul.r li{display:flex;gap:8px;align-items:center}
+.fab{position:absolute;right:14px;width:50px;height:50px;border-radius:50%;background:var(--a-blue);display:grid;place-items:center;color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.4)}
+.fab .ic{width:20px;height:20px}
+.fab.mic{bottom:80px}.fab.plus{bottom:22px}
+.press{animation:press .3s}
+@keyframes press{50%{transform:scale(.92);filter:brightness(1.25)}}
+.tap{position:absolute;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:2px solid #fff;background:rgba(255,255,255,.28);z-index:60;pointer-events:none;animation:tap .55s ease-out forwards}
+@keyframes tap{0%{transform:scale(.4);opacity:0}30%{opacity:1}100%{transform:scale(1.3);opacity:0}}
+.dim{position:absolute;inset:0;background:rgba(5,6,8,.72);z-index:20}
+.bigmic{position:absolute;inset:26px 0 0;z-index:25;display:grid;place-items:center;align-content:center;gap:12px}
+.bigmic .b{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3b72f0,#1d4ed8);display:grid;place-items:center;color:#fff;box-shadow:0 0 0 14px rgba(37,99,235,.12)}
+.bigmic .b .ic{width:58px;height:58px;stroke-width:2.2}
+.bigmic small{color:#94a3b8;font-size:11px}
+.warn{position:absolute;left:10px;right:10px;top:34px;z-index:30;background:#1e2129;border:1px solid var(--a-line);border-radius:10px;padding:10px 12px;font-weight:600;display:flex;gap:8px;align-items:center;transform:translateY(-16px)}
+.warn.on{transform:none}
+/* voice */
+.voice{display:flex;flex-direction:column;justify-content:center;gap:10px;text-align:center}
+.wave{display:flex;justify-content:center;align-items:center;gap:5px;height:44px}
+.wave span{width:6px;border-radius:4px;background:var(--a-lime);height:14px;animation:wv 1s ease-in-out infinite}
+.wave span:nth-child(2){animation-delay:.15s}.wave span:nth-child(3){animation-delay:.3s}.wave span:nth-child(4){animation-delay:.45s}.wave span:nth-child(5){animation-delay:.6s}
+@keyframes wv{50%{height:40px}}
+.wave.x{display:none}.wave.x.on{display:flex}
+.vt{font-size:16px;font-weight:600}
+.field{border:1px solid var(--a-line);background:var(--a-card);border-radius:10px;padding:9px 12px;text-align:left;min-height:36px;font-size:12.5px;white-space:nowrap;overflow:hidden}
+.field.focus{border-color:var(--a-blue)}
+.ph{color:#566174}
+.caret{display:inline-block;width:1.5px;height:13px;background:var(--a-fg);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.hint{font-size:10.5px;color:#566174}
+.prev{border:1px solid var(--a-line);background:var(--a-card);border-radius:12px;padding:12px;text-align:left;display:grid;gap:7px}
+.prev.rem{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
+.prev .k{font:600 9.5px var(--f-mono);letter-spacing:.08em;color:var(--a-muted)}
+.prev .row{display:flex;gap:8px;align-items:center}
+.prev .row>span:first-child{color:var(--a-muted);font-size:11.5px;min-width:56px}
+.prev .row.hide{display:none}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border-radius:10px;padding:10px;display:flex;justify-content:center;align-items:center;gap:6px;font-weight:600;font-size:12.5px}
+.btn.ghost{border:1px solid var(--a-line)}
+.btn.lime{background:var(--a-lime);color:#14171d;transition:opacity .3s}
+.btn.lime.off{opacity:.5}
+.btn.blue{background:var(--a-blue);color:#fff}
+.btn.green{background:#16a34a;color:#fff}
+/* dialog */
+.dlg{position:absolute;left:0;right:0;top:150px;z-index:30;background:#16191f;border-top:1px solid var(--a-line);border-bottom:1px solid var(--a-line);padding:16px 14px;display:grid;gap:9px}
+.dlg h4{margin:0 0 4px;text-align:center;font-size:15px}
+.dlg .close{position:absolute;right:14px;top:14px;color:var(--a-muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sel{display:flex;align-items:center;gap:6px;border:1px solid var(--a-line);border-radius:10px;padding:8px 10px;font-size:12px;background:var(--a-card)}
+.tagrow{display:grid;grid-template-columns:1fr 34px;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:#2a2e38;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:600;justify-self:start}
+.chip.x{display:none}.chip.x.on{display:inline-flex}
+.dlg .btns{grid-template-columns:auto auto;justify-content:end}
+/* month */
+.mhead{display:flex;align-items:center;gap:10px}
+.mhead .t{font-size:15px;font-weight:600;flex:1}
+.today-b{border:1px solid var(--a-blue);color:#7aa2f7;border-radius:999px;padding:4px 10px;font-size:11px}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:6px;text-align:center;margin-top:10px}
+.mgrid b{font:600 9px var(--f-body);color:var(--a-muted)}
+.mgrid .d{width:30px;height:30px}
+.legend{display:flex;gap:6px;align-items:center;color:var(--a-muted);font-size:10.5px;margin-top:10px}
+.legend::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--a-cal)}
+.acts{display:grid;grid-template-columns:repeat(3,auto);gap:12px 16px;margin:8px 0 0 22px;font-size:12px}
+.acts span{display:flex;gap:5px;align-items:center}
+.done .tt{text-decoration:line-through;color:var(--a-muted)}
+/* settings */
+.shead{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid var(--a-line);margin:0 -14px;padding-inline:14px;background:var(--a-bg);position:relative;z-index:2}
+.shead .t{flex:1;font-size:16px;font-weight:600}
+.save{background:#16a34a;color:#fff;border-radius:10px;padding:7px 12px;display:flex;gap:5px;align-items:center;font-weight:600}
+.svp{position:absolute;inset:52px 0 0;overflow:hidden}
+.sin{grid-template-columns:minmax(0,1fr);padding:12px 14px 40px;transition:transform .9s cubic-bezier(.5,0,.2,1);display:grid;gap:12px;position:relative}
+.card{border:1px solid var(--a-line);border-radius:12px;padding:12px;background:var(--a-card)}
+.card .k{font:600 9.5px var(--f-mono);letter-spacing:.14em;color:var(--a-muted);margin-bottom:8px}
+.acc{display:flex;gap:10px;align-items:center}
+.av{width:34px;height:34px;border-radius:50%;background:#3b5b7a;display:grid;place-items:center;font-weight:700;font-size:14px}
+.acc .m{flex:1;min-width:0}.acc .m div{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.acc .m div:last-child{color:var(--a-muted);font-size:11px}
+.so{border:1px solid var(--a-line);border-radius:8px;padding:5px 8px;font-size:10.5px;display:flex;gap:4px;align-items:center}
+.pro{border:1px solid rgba(245,158,11,.5);background:rgba(245,158,11,.07);border-radius:10px;padding:10px;display:flex;gap:10px;align-items:center}
+.pro .cup{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#f97316);display:grid;place-items:center;color:#fff;flex:none}
+.pro small{display:block;color:var(--a-muted);font-size:10.5px}
+.fbb{border:1px solid var(--a-line);border-radius:8px;padding:8px 10px;margin-top:8px;display:flex;gap:7px;align-items:center}
+.set .l{font-weight:600;margin-bottom:5px}
+.dd{border:1px solid var(--a-line);background:var(--a-card);border-radius:9px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center}
+.ddm{border:1px solid var(--a-line);background:#1e2129;border-radius:9px;margin-top:5px;padding:4px;display:none}
+.ddm.on{display:block}
+.ddm div{padding:7px 8px;border-radius:6px;display:flex;justify-content:space-between}
+.ddm div:first-child{background:#2a2e38}
+.sub{color:#566174;font-size:10.5px;margin-top:3px}
+.tg2{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.tg2 .m{min-width:0}.tg2 .m small{display:block;color:var(--a-muted);font-size:10.5px}
+.ck{width:16px;height:16px;border-radius:50%;flex:none;border:1.5px solid #64748b}
+.ck.on{background:var(--a-blue);border-color:var(--a-blue);box-shadow:inset 0 0 0 3px var(--a-blue);position:relative}
+.ck.on::after{content:"";position:absolute;left:5px;top:2px;width:3px;height:7px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.glow{animation:glow 1.4s}
+@keyframes glow{0%,100%{box-shadow:none}40%{box-shadow:0 0 0 2px var(--a-lime)}}
+.danger{border:1px solid rgba(239,68,68,.5);color:#f87171;border-radius:10px;padding:9px;text-align:center;display:flex;justify-content:center;gap:6px;align-items:center}
+/* feedback */
+.fbg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.fbg div{border:1px solid var(--a-line);border-radius:12px;padding:12px 6px;text-align:center;display:grid;gap:5px;justify-items:center;font-size:11.5px;background:var(--a-card);transition:border-color .2s,background .2s}
+.fbg div.pick{border-color:var(--a-blue);background:rgba(37,99,235,.12)}
+.fbg .ic{width:18px;height:18px}
+.ta{border:1px solid var(--a-line);background:var(--a-card);border-radius:10px;padding:10px;height:84px;font-size:12px;white-space:normal}
+.hold{position:absolute;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid var(--a-lime);z-index:60;pointer-events:none;animation:hold .75s ease-out forwards}
+@keyframes hold{0%{transform:scale(.35);opacity:.3}85%{transform:scale(1);opacity:1}100%{transform:scale(1.15);opacity:0}}
+ul.n li{flex-wrap:wrap;transition:color .6s}
+ul.n li>span{flex:1;min-width:0}
+ul.n li::before{transition:background .6s}
+ul.n li.low::before{background:#64748b}
+ul.n li.dn{color:var(--a-muted);text-decoration:line-through;opacity:.55}
+ul.n li.dn::before{opacity:.6}
+ul.n li.od .tg{color:rgba(248,113,113,.7)}
+ul.n li .dt{display:inline-block}
+ul.n li .dt .ic{width:10px;height:10px;vertical-align:-1px;margin-left:2px}
+ul.n li.saved{animation:pop 1s}
+.flip{animation:flip .6s}
+@keyframes flip{50%{transform:rotateX(90deg);opacity:.2}}
+.acts.collapse{flex-basis:calc(100% - 14px);margin:8px 0 4px 14px;font-size:11.5px;gap:10px 12px}
+.acts.collapse.on{display:grid}
+.sect{display:flex;gap:7px;align-items:center;font:600 9.5px var(--f-mono);letter-spacing:.14em;color:var(--a-muted);margin:12px 0 7px}
+ul.r li.x{display:none}ul.r li.x.on{display:flex;animation:pop .8s}
+.tdlg{position:absolute;left:8px;right:8px;top:34px;z-index:30;background:#191c23;border:1px solid var(--a-line);border-radius:14px;padding:14px 12px;display:grid;gap:9px}
+.tdlg h4{margin:0;text-align:center;font-size:15px}
+.tdlg .close{position:absolute;right:12px;top:12px;color:var(--a-muted)}
+.tbox{background:#22262e;border-radius:10px;padding:10px;display:grid;gap:7px}
+.tbox p{margin:0;color:#94a3b8;font-size:11px}
+.tbox .field{padding:7px 10px;min-height:30px;font-size:11.5px}
+.tbox .btn{padding:8px}
+.tdlg .k{font:600 9.5px var(--f-mono);letter-spacing:.12em;color:var(--a-muted)}
+.titem{display:flex;gap:8px;align-items:flex-start;background:#22262e;border-radius:10px;padding:8px 10px}
+.titem .dot{margin-top:5px}
+.titem>div{flex:1;min-width:0}
+.titem small{display:block;color:var(--a-muted);font-size:10px}
+.titem .ic{color:#94a3b8;width:13px;height:13px}
+.titem .ic+.ic{color:#f87171}
+.titem.x{display:none}.titem.x.on{display:flex;animation:pop .8s}
+.tfoot{color:#566174;font-size:10px;border-top:1px solid var(--a-line);padding-top:7px}
+@media (max-width:760px){
+  section.ch,section.ch.flip{grid-template-columns:minmax(0,1fr);gap:28px}
+  section.ch.flip .stage{order:0}
+}
+@media (max-width:600px){
+  body{font-size:18px;line-height:1.6}
+  .top .wrap{gap:10px;padding-block:12px}
+  .brand{font-size:16px}
+  .chips a{font-size:15px;padding:7px 13px}
+  .lang button{font-size:14px;padding:7px 12px}
+  .hero{padding-block:40px 28px}
+  .eyebrow{font-size:14px}
+  h1{font-size:46px}
+  .lede{font-size:20px}
+  .ver{font-size:14px}
+  h2{font-size:32px}
+  h3{font-size:18px}
+  section.ch{padding-block:44px}
+  .say{font-size:16px;white-space:normal}
+  .tip{font-size:17px}
+  .kw table{min-width:0;font-size:16px}
+  .kw td:first-child{white-space:normal;width:38%}
+  .box{padding:20px}
+  .ctrl{font-size:14px;padding:9px 16px}
+  footer{font-size:16px}
+}
+@media (prefers-reduced-motion: reduce){
+  .scr,.x,.sin{transition:none}
+  .wave span,.caret{animation:none}
+}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><img src="data:image/png;base64,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" alt="">TapRemember</div>
+    <nav class="chips" aria-label="Capitoli">
+      <a href="#voce"><span lang="it">Dettare</span><span lang="en">Dictate</span></a>
+      <a href="#parser"><span lang="it">Cosa capisce</span><span lang="en">What it understands</span></a>
+      <a href="#promemoria"><span lang="it">Promemoria rapidi</span><span lang="en">Quick reminders</span></a>
+      <a href="#tag">Tag</a>
+      <a href="#manuale"><span lang="it">Nota a mano</span><span lang="en">Type a note</span></a>
+      <a href="#calendario"><span lang="it">Calendario</span><span lang="en">Calendar</span></a>
+      <a href="#giorno"><span lang="it">Tieni premuto</span><span lang="en">Press and hold</span></a>
+      <a href="#lista"><span lang="it">La lista</span><span lang="en">The list</span></a>
+      <a href="#impostazioni"><span lang="it">Impostazioni</span><span lang="en">Settings</span></a>
+      <a href="#notifiche"><span lang="it">Notifiche</span><span lang="en">Notifications</span></a>
+      <a href="#account"><span lang="it">Account e Pro</span><span lang="en">Account &amp; Pro</span></a>
+      <a href="#feedback">Feedback</a>
+    </nav>
+    <div class="lang" role="group" aria-label="Lingua / Language">
+      <button type="button" id="l-it" data-l="it">IT</button><button type="button" id="l-en" data-l="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <img src="data:image/png;base64,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" alt="TapRemember">
+    <div class="eyebrow"><span lang="it">Guida rapida</span><span lang="en">Quick guide</span></div>
+    <h1><span lang="it">Parli. <em>Lui</em> si ricorda.</span><span lang="en">You talk. <em>It</em> remembers.</span></h1>
+    <p class="lede"><span lang="it">Cattura veloce, organizzi con calma. In due minuti vedi come dettare una nota, cosa capisce TapRemember da solo e dove trovare tutto il resto.</span><span lang="en">Capture fast, organise later. In two minutes you'll see how to dictate a note, what TapRemember understands on its own and where everything else lives.</span></p>
+    <div class="ver"><span lang="it">Valida per TapRemember v1.1 · Le schermate usano dati di esempio</span><span lang="en">For TapRemember v1.1 · Screens use sample data</span></div>
+  </div>
+
+  <!-- 1 VOCE -->
+  <section class="ch" id="voce">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Dettatura</span><span lang="en">Dictation</span></div>
+      <h2><span lang="it">Un tocco, una frase, fatto</span><span lang="en">One tap, one sentence, done</span></h2>
+      <p lang="it">Tocca il grande microfono blu e parla come parleresti a una persona: <span class="say">compra il latte domani</span>. Mentre parli il testo compare nel campo, e sotto vedi l'<b>anteprima</b> con titolo, priorità e scadenza già separati.</p>
+      <p lang="en">Tap the big blue microphone and speak naturally: <span class="say">buy the milk tomorrow</span>. Your words appear in the field and the <b>preview</b> below already splits out title, priority and due date.</p>
+      <p lang="it">Tocca <b>Aggiungi</b> e la nota finisce in cima alla lista. Se preferisci scrivere, puoi digitare nello stesso campo.</p>
+      <p lang="en">Tap <b>Add</b> and the note lands at the top of your list. Prefer typing? Type straight into the same field.</p>
+      <p class="tip" lang="it">Il microfono piccolo in basso a destra avvia la dettatura da qualsiasi punto della lista.</p>
+      <p class="tip" lang="en">The small microphone at the bottom right starts dictation from anywhere in the list.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="voice"></div></div>
+  </section>
+
+  <!-- 2 PARSER -->
+  <section class="ch flip" id="parser">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Il parser</span><span lang="en">The parser</span></div>
+      <h2><span lang="it">Cosa capisce da solo</span><span lang="en">What it picks up by itself</span></h2>
+      <p lang="it">Non serve toccare menu: date, priorità, ripetizioni e tag li riconosce dalle parole. Le togliamo dal titolo, così la nota resta pulita.</p>
+      <p lang="en">No menus needed: dates, priority, repeats and tags are recognised from your words and removed from the title, so the note stays clean.</p>
+      <div class="kw">
+        <table lang="it">
+          <thead><tr><th>Cosa</th><th>Esempi da dire</th></tr></thead>
+          <tbody>
+            <tr><td>Data</td><td>oggi · domani · dopodomani · lunedì · tra 3 giorni · il 15 · 15 marzo</td></tr>
+            <tr><td>Priorità alta</td><td>urgente · importante · priorità alta</td></tr>
+            <tr><td>Priorità bassa</td><td>priorità bassa · non urgente · poco urgente</td></tr>
+            <tr><td>Ripetizione</td><td>ogni giorno · ogni settimana · ogni mese · ogni anno · ogni 2 giorni</td></tr>
+            <tr><td>Tag</td><td>#lavoro, oppure una parola chiave del tag (es. «pane» → #spesa)</td></tr>
+            <tr><td>Promemoria rapido</td><td>inizia con «Ricorda…» → vedi <a href="#promemoria">Promemoria rapidi</a></td></tr>
+          </tbody>
+        </table>
+        <table lang="en">
+          <thead><tr><th>What</th><th>Things to say</th></tr></thead>
+          <tbody>
+            <tr><td>Date</td><td>today · tomorrow · monday · in 3 days · march 15</td></tr>
+            <tr><td>High priority</td><td>urgent · high priority</td></tr>
+            <tr><td>Low priority</td><td>low priority</td></tr>
+            <tr><td>Repeat</td><td>every day · every week · every month · every year · every 2 days</td></tr>
+            <tr><td>Tag</td><td>#work, or one of the tag's keywords (e.g. "bread" → #groceries)</td></tr>
+            <tr><td>Quick reminder</td><td>start with "Remember…" → see <a href="#promemoria">Quick reminders</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tip" lang="it">Per i tag che si assegnano da soli serve prima crearli: vedi <a href="#tag">Tag che si riconoscono da soli</a>.</p>
+      <p class="tip" lang="en">For tags that assign themselves you first create them: see <a href="#tag">Tags that recognise themselves</a>.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="parser"></div></div>
+  </section>
+
+  <!-- PROMEMORIA RAPIDI -->
+  <section class="ch" id="promemoria">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Promemoria rapidi</span><span lang="en">Quick reminders</span></div>
+      <h2><span lang="it">Il codice del cancello, il posto auto, quel numero</span><span lang="en">The gate code, the parking spot, that number</span></h2>
+      <p lang="it">Alcune cose non hanno una scadenza: devi solo ricordartele per un po'. Inizia la frase con <span class="say">Ricorda</span> e TapRemember la salva <b>così com'è</b>, senza cercare date, priorità o tag.</p>
+      <p lang="en">Some things have no due date: you just need to remember them for a while. Start with <span class="say">Remember</span> and TapRemember saves it <b>as-is</b>, without looking for dates, priority or tags.</p>
+      <ul lang="it">
+        <li><span class="say">Ricorda codice cancello 451</span></li>
+        <li><span class="say">Ricorda parcheggio piano B posto 12</span></li>
+        <li><span class="say">Ricorda armadietto 27</span></li>
+      </ul>
+      <ul lang="en">
+        <li><span class="say">Remember gate code 451</span></li>
+        <li><span class="say">Remember parking level B spot 12</span></li>
+        <li><span class="say">Remember locker 27</span></li>
+      </ul>
+      <p lang="it">Li ritrovi in giallo, con l'icona del taccuino, nella sezione <b>Quick reminders</b> della home, in ordine di salvataggio. Nella vista lista hanno una sezione tutta loro.</p>
+      <p lang="en">You'll find them in yellow, with the notebook icon, in the <b>Quick reminders</b> section of the home screen, in the order you saved them. List view gives them their own section.</p>
+      <p class="tip" lang="it">Parcheggi in un garage enorme? Un «Ricorda» mentre scendi dall'auto e al ritorno non giri a vuoto.</p>
+      <p class="tip" lang="en">Parking in a huge garage? Say "Remember…" as you get out of the car and you won't wander around on the way back.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="reminders"></div></div>
+  </section>
+
+  <!-- TAG -->
+  <section class="ch flip" id="tag">
+    <div class="copy">
+      <div class="eyebrow">Tag</div>
+      <h2><span lang="it">Tag che si riconoscono da soli</span><span lang="en">Tags that recognise themselves</span></h2>
+      <p lang="it">In <b>Gestisci tag</b> crei un tag e gli dai delle <b>parole chiave</b>, separate da virgola. Da quel momento, quando detti una nota che contiene una di quelle parole, il tag viene assegnato in automatico.</p>
+      <p lang="en">In <b>Manage tags</b> you create a tag and give it some <b>keywords</b>, separated by commas. From then on, whenever you dictate a note containing one of those words, the tag is assigned automatically.</p>
+      <ol lang="it">
+        <li>Nome del tag: <span class="say">spesa</span></li>
+        <li>Parole chiave: <span class="say">compra, supermercato, latte</span></li>
+        <li>Tocca <b>Crea tag</b></li>
+        <li>Detta <span class="say">compra il latte domani</span> → la nota esce già con <b>#spesa</b></li>
+      </ol>
+      <ol lang="en">
+        <li>Tag name: <span class="say">groceries</span></li>
+        <li>Keywords: <span class="say">buy, supermarket, shop</span></li>
+        <li>Tap <b>Create tag</b></li>
+        <li>Say <span class="say">buy the milk tomorrow</span> → the note comes out already tagged <b>#groceries</b></li>
+      </ol>
+      <p lang="it">Anche il nome stesso del tag conta come parola chiave. Le parole troppo corte (due lettere o meno) vengono ignorate. In ogni momento puoi modificare o eliminare un tag con la matita o il cestino.</p>
+      <p lang="en">The tag name itself also counts as a keyword. Very short words (two letters or fewer) are ignored. You can edit or delete a tag at any time with the pencil or the bin.</p>
+      <p class="tip" lang="it">Vuoi un tag al volo senza crearlo prima? Dillo con il cancelletto: <span class="say">#lavoro</span>.</p>
+      <p class="tip" lang="en">Want a one-off tag? Say it with a hash: <span class="say">#work</span>.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="tags"></div></div>
+  </section>
+
+  <!-- 3 MANUALE -->
+  <section class="ch" id="manuale">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Nota a mano</span><span lang="en">Typed note</span></div>
+      <h2><span lang="it">Quando vuoi decidere tu ogni dettaglio</span><span lang="en">When you want to set every detail</span></h2>
+      <p lang="it">Il pulsante <b>+</b> apre il modulo <b>Nuova attività</b>. Scrivi cosa devi fare e, se vuoi, scegli:</p>
+      <p lang="en">The <b>+</b> button opens the <b>New task</b> form. Write what you need to do and optionally set:</p>
+      <ul lang="it"><li><b>Priorità</b>: alta, media o bassa (il pallino colorato della nota)</li><li><b>Scadenza</b> dal calendario</li><li><b>Tag</b>: cerca tra quelli esistenti o crea il nuovo con +</li><li><b>Ripetizione</b>: nessuna, giornaliera, settimanale…</li></ul>
+      <ul lang="en"><li><b>Priority</b>: high, medium or low (the note's coloured dot)</li><li><b>Due date</b> from the calendar</li><li><b>Tags</b>: search existing ones or create one with +</li><li><b>Repeat</b>: none, daily, weekly…</li></ul>
+      <p class="tip" lang="it">Per cambiare una nota già salvata: toccala e scegli <b>Modifica</b>. Ritrovi gli stessi campi.</p>
+      <p class="tip" lang="en">To change a saved note, tap it and choose <b>Edit</b>. Same fields, same place.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="manual"></div></div>
+  </section>
+
+  <!-- 4 CALENDARIO -->
+  <section class="ch flip" id="calendario">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Organizza</span><span lang="en">Organise</span></div>
+      <h2><span lang="it">Calendario e azioni sulla nota</span><span lang="en">Calendar and note actions</span></h2>
+      <p lang="it">In alto vedi la settimana: il cerchio blu è oggi, i giorni verdi hanno note in scadenza. <b>Apri mese</b> mostra il mese intero; tocca un giorno per vederne le note.</p>
+      <p lang="en">The week strip sits at the top: the blue ring is today, green days have notes due. <b>Open month</b> shows the full month; tap a day to see its notes.</p>
+      <p lang="it">Tocca una nota per le azioni:</p>
+      <p lang="en">Tap a note for its actions:</p>
+      <ul lang="it"><li><b>Completa</b>: la segni come fatta</li><li><b>Modifica</b>: cambi testo, priorità, data, tag, ripetizione</li><li><b>Archivia</b>: la togli dalla lista senza perderla; dall'archivio la ripristini</li><li><b>Elimina</b>: la cancelli</li></ul>
+      <ul lang="en"><li><b>Complete</b>: mark it done</li><li><b>Edit</b>: change text, priority, date, tags, repeat</li><li><b>Archive</b>: hide it without losing it; restore it from the archive</li><li><b>Delete</b>: remove it</li></ul>
+      <p class="tip" lang="it">Il calendario ha anche una scorciatoia nascosta: <a href="#giorno">tieni premuto un giorno</a>.</p>
+      <p class="tip" lang="en">The calendar also hides a shortcut: <a href="#giorno">press and hold a day</a>.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="calendar"></div></div>
+  </section>
+
+  <!-- TIENI PREMUTO -->
+  <section class="ch" id="giorno">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Scorciatoia</span><span lang="en">Shortcut</span></div>
+      <h2><span lang="it">Tieni premuto un giorno, poi parla</span><span lang="en">Press and hold a day, then talk</span></h2>
+      <p lang="it">Nella <b>settimana</b> in alto nella home, <b>tieni premuto</b> il dito su un giorno per mezzo secondo: parte subito la dettatura e la nota viene salvata con <b>scadenza quel giorno</b>. Non serve dire la data.</p>
+      <p lang="en">In the <b>week strip</b> at the top of the home screen, <b>press and hold</b> a day for half a second: dictation starts right away and the note is saved <b>due on that day</b>. No need to say the date.</p>
+      <p lang="it">È il modo più veloce per pianificare: guardi la settimana, scegli il giorno, dici cosa fare.</p>
+      <p lang="en">It's the fastest way to plan: look at the week, pick the day, say what to do.</p>
+      <ul lang="it"><li><b>Tocco breve</b> su un giorno della settimana: si apre il mese con quel giorno e le sue note.</li><li><b>Pressione lunga</b> su un giorno, nella settimana o nel mese intero: parte la dettatura con la data di quel giorno.</li></ul>
+      <ul lang="en"><li><b>Short tap</b> on a day in the week strip: the month opens on that day, with its notes.</li><li><b>Press and hold</b> a day, in the week strip or in the month view: dictation starts, dated that day.</li></ul>
+      <p class="tip" lang="it">Se mentre tieni premuto fai scorrere il dito, la pressione si annulla: niente dettature partite per sbaglio.</p>
+      <p class="tip" lang="en">If your finger slides while holding, the press is cancelled, so no accidental dictation.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="dayhold"></div></div>
+  </section>
+
+  <!-- LISTA -->
+  <section class="ch flip" id="lista">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Vista lista</span><span lang="en">List view</span></div>
+      <h2><span lang="it">Tutto in un colpo d'occhio</span><span lang="en">Everything at a glance</span></h2>
+      <p lang="it">Quando apri l'app, un avviso ti dice quante note sono scadute. <b>Vista lista</b> mostra tutto insieme, e ogni nota si riconosce dal suo aspetto:</p>
+      <p lang="en">When you open the app, a banner tells you how many notes are overdue. <b>List view</b> shows everything together, and each note is recognisable by how it looks:</p>
+      <ul lang="it">
+        <li><b style="color:#ef4444">Rosso con ⚠️</b>: scaduta, con da quanti giorni</li>
+        <li><b>Pallino</b>: rosso priorità alta, giallo media, grigio bassa</li>
+        <li><b>⟲</b> accanto alla data: nota che si ripete</li>
+        <li><b>Reminders</b>: i promemoria rapidi, in giallo</li>
+        <li><b>Completed</b>: le note fatte, barrate (si nascondono in Impostazioni → Mostra note completate)</li>
+      </ul>
+      <ul lang="en">
+        <li><b style="color:#ef4444">Red with ⚠️</b>: overdue, with how many days ago</li>
+        <li><b>Dot</b>: red high priority, yellow medium, grey low</li>
+        <li><b>⟲</b> next to the date: a repeating note</li>
+        <li><b>Reminders</b>: your quick reminders, in yellow</li>
+        <li><b>Completed</b>: done notes, struck through (hide them in Settings → Show completed notes)</li>
+      </ul>
+      <h3><span lang="it">«Start a diet»… da domani</span><span lang="en">"Start a diet"… tomorrow</span></h3>
+      <p lang="it">Sulle note scadute compare un pulsante in più: <b>→ Domani</b>. Un tocco e la scadenza passa a domani, senza aprire il modulo di modifica. Sì, funziona anche con la dieta.</p>
+      <p class="tip" lang="it">E su «Start a diet» puoi premere <b>→ Domani</b> tutte le volte che vuoi. TapRemember non giudica.</p>
+      <p lang="en">Overdue notes get an extra button: <b>→ Tomorrow</b>. One tap moves the due date to tomorrow, without opening the edit form. Yes, it works for diets too.</p>
+      <p class="tip" lang="en">And you can tap <b>→ Tomorrow</b> on "Start a diet" as many times as you like. TapRemember won't judge.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="overdue"></div></div>
+  </section>
+
+  <!-- 6 IMPOSTAZIONI -->
+  <section class="ch" id="impostazioni">
+    <div class="copy">
+      <div class="eyebrow"><span lang="it">Impostazioni</span><span lang="en">Settings</span></div>
+      <h2><span lang="it">Fai lavorare l'app come piace a te</span><span lang="en">Make the app work your way</span></h2>
+      <p lang="it">Ricordati di toccare <b>Salva</b> in alto dopo le modifiche.</p>
+      <p lang="en">Remember to tap <b>Save</b> at the top after making changes.</p>
+      <ul lang="it">
+        <li><b>Lingua</b>: vale sia per l'app sia per il riconoscimento vocale.</li>
+        <li><b>All'apertura</b>: mostrare il pulsante di dettatura, avviare subito la dettatura o aprire solo l'app.</li>
+        <li><b>Salvataggio a voce</b>: con la <b>parola di chiusura</b> concludi la frase con <span class="say">salva</span>, <span class="say">aggiungi</span> o <span class="say">fine</span>; oppure scegli <b>salva dopo il silenzio</b>, per salvare automaticamente dopo una pausa.</li>
+        <li><b>Backup</b>: <b>Esporta note (.xlsx)</b> crea un file Excel con le tue note.</li>
+        <li><b>Zona pericolosa</b>: elimina in un colpo tutte le note completate.</li>
+      </ul>
+      <ul lang="en">
+        <li><b>Language</b>: applies to the app and to voice recognition.</li>
+        <li><b>When the app opens</b>: show the dictation button, start dictation right away, or just open the app.</li>
+        <li><b>Voice saving</b>: with the <b>closing word</b> you end the sentence with <span class="say">save</span>, <span class="say">add</span> or <span class="say">done</span>; or pick <b>save after silence</b> to save automatically after a pause.</li>
+        <li><b>Backup</b>: <b>Export notes (.xlsx)</b> creates an Excel file of your notes.</li>
+        <li><b>Danger zone</b>: delete all completed notes at once.</li>
+      </ul>
+    </div>
+    <div class="stage"><div class="phone" data-scene="settings"></div></div>
+  </section>
+
+  <!-- 7 NOTIFICHE (solo testo) -->
+  <section class="ch text" id="notifiche">
+    <div class="copy" style="max-width:none">
+      <div class="eyebrow"><span lang="it">Notifiche</span><span lang="en">Notifications</span></div>
+      <h2><span lang="it">Promemoria che arrivano davvero</span><span lang="en">Reminders that actually arrive</span></h2>
+      <div class="cols">
+        <div class="box">
+          <h3><span lang="it">Nell'app</span><span lang="en">In the app</span></h3>
+          <p lang="it">Impostazioni → <b>Ricordami le scadenze</b>: ricevi una notifica il giorno della scadenza, anche ad app chiusa. Con <b>Ora del promemoria</b> scegli a che ora; vale per tutte le note con una scadenza.</p>
+          <p lang="en">Settings → <b>Remind me about due dates</b>: one notification on the due day, even with the app closed. <b>Reminder time</b> sets the hour; it applies to every note with a due date.</p>
+        </div>
+        <div class="box">
+          <h3><span lang="it">Sul telefono (Xiaomi, Huawei, Oppo…)</span><span lang="en">On the phone (Xiaomi, Huawei, Oppo…)</span></h3>
+          <p lang="it">Alcuni telefoni bloccano le notifiche per risparmiare batteria. Aggiungi TapRemember alle eccezioni:</p>
+          <p lang="en">Some phones block notifications to save battery. Add TapRemember to the exceptions:</p>
+          <ol lang="it"><li>Impostazioni del telefono → Batteria → TapRemember</li><li>Scegli «Nessuna restrizione» o «Consenti attività in background»</li><li>Su alcuni modelli cerca anche «Avvio automatico» e attivalo</li></ol>
+          <ol lang="en"><li>Phone settings → Battery → TapRemember</li><li>Choose "No restrictions" or "Allow background activity"</li><li>On some brands also look for "Autostart" and enable it</li></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 ACCOUNT -->
+  <section class="ch text" id="account">
+    <div class="copy" style="max-width:none">
+      <div class="eyebrow"><span lang="it">Account e Pro</span><span lang="en">Account &amp; Pro</span></div>
+      <h2><span lang="it">Ospite o con Google: scegli tu</span><span lang="en">Guest or Google: your call</span></h2>
+      <div class="cols">
+        <div class="box">
+          <h3><span lang="it">Come ospite</span><span lang="en">As a guest</span></h3>
+          <p lang="it">Inizi subito, senza account. Le note restano solo su questo telefono: se disinstalli l'app o cambi telefono, le perdi.</p>
+          <p lang="en">Start right away, no account. Notes stay on this phone only: uninstall the app or change phone and they're gone.</p>
+        </div>
+        <div class="box">
+          <h3><span lang="it">Con Google</span><span lang="en">With Google</span></h3>
+          <p lang="it">Le note vengono salvate nel cloud e sincronizzate. Al primo accesso, le note che avevi da ospite vengono trasferite automaticamente.</p>
+          <p lang="en">Notes are saved to the cloud and synced. On your first sign-in, your guest notes are moved over automatically.</p>
+        </div>
+        <div class="box">
+          <h3>Free · Pro</h3>
+          <p lang="it">TapRemember è gratuito. Il Pro, con funzioni in più, è in arrivo.</p>
+          <p lang="en">TapRemember is free. Pro, with extra features, is coming soon.</p>
+          <div class="price">2,99 € <span class="ver" style="vertical-align:middle;border:1px solid var(--line);border-radius:999px;padding:2px 9px"><span lang="it">In arrivo</span><span lang="en">Coming soon</span></span></div>
+          <p lang="it">una volta sola, nessun abbonamento. Lo sblocco Pro <b>è in arrivo</b>: per ora in Impostazioni → <b>Sostieni l'app e passa a Pro</b> trovi le donazioni (da 2 €).</p>
+          <p lang="en">once, no subscription. The Pro unlock is <b>coming soon</b>: for now, Settings → <b>Support the app &amp; go Pro</b> has donations (from €2).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 FEEDBACK -->
+  <section class="ch flip" id="feedback">
+    <div class="copy">
+      <div class="eyebrow">Feedback</div>
+      <h2><span lang="it">Dimmi cosa non va (o cosa ti piace)</span><span lang="en">Tell me what's wrong (or what you like)</span></h2>
+      <p lang="it">Impostazioni → <b>Invia feedback</b>. Scegli il tipo (bug, nuova funzione, miglioramento, apprezzamento), scrivi il messaggio e invia.</p>
+      <p lang="en">Settings → <b>Send feedback</b>. Pick a type (bug, new feature, improvement, appreciation), write your message and send.</p>
+      <p class="tip" lang="it">Il feedback è disponibile per chi ha fatto l'accesso con Google.</p>
+      <p class="tip" lang="en">Feedback is available once you're signed in with Google.</p>
+    </div>
+    <div class="stage"><div class="phone" data-scene="feedback"></div></div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span lang="it">TapRemember · guida per la v1.1 · Privacy:</span><span lang="en">TapRemember · guide for v1.1 · Privacy:</span>
+    <a href="https://grossoroberto.github.io/tapremember-privacy/privacy_policy.html">privacy policy</a> · <a href="https://grossoroberto.github.io/tapremember-privacy/delete_account.html"><span lang="it">elimina account</span><span lang="en">delete account</span></a>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+/* ---------- lingua ---------- */
+const root=document.documentElement;
+function setLang(l){root.dataset.lang=l;root.lang=l;
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.l===l)));
+  try{localStorage.setItem('tr-help-lang',l)}catch(e){}
+  document.querySelectorAll('.ctrl').forEach(updCtrl);}
+let L='it';
+/* lingua passata dall'app (?lang=it|en|es|fr|de): vince su tutto; lingue non ancora tradotte -> inglese */
+let Q='';try{Q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2)}catch(e){Q=''}
+if(Q){L=Q}else{try{L=localStorage.getItem('tr-help-lang')||''}catch(e){L=''}
+if(!L){L=(navigator.language||'it').toLowerCase().startsWith('it')?'it':'en'}}
+if(L!=='it'&&L!=='en')L='en';
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
+
+/* ---------- icone ---------- */
+const P={
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ plus:'<path d="M12 5v14M5 12h14"/>',
+ list:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+ dots:'<circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+ cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+ rep:'<path d="M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4"/>',
+ check:'<path d="M5 12l5 5 9-10"/>',
+ x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ pen:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+ arch:'<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10h14V9M10 13h4"/>',
+ trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>',
+ chev:'<path d="M6 9l6 6 6-6"/>',
+ right:'<path d="M9 5l7 7-7 7"/>',
+ note:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/>',
+ warn:'<path d="M12 3l10 18H2zM12 10v5M12 18v.5"/>',
+ bug:'<rect x="7" y="7" width="10" height="13" rx="5"/><path d="M12 7v13M3 12h4M17 12h4M4 7l3 2M20 7l-3 2M4 19l3-2M20 19l-3-2M9 4l1.5 2.5M15 4l-1.5 2.5"/>',
+ bulb:'<path d="M9 18h6M10 21h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 3H9c0-1 0-2-1-3z"/>',
+ star:'<path d="M12 3l2.8 6 6.2.6-4.7 4.2 1.4 6.2L12 17l-5.7 3 1.4-6.2L3 9.6 9.2 9z"/>',
+ heart:'<path d="M12 20s-8-5-8-11a4.5 4.5 0 0 1 8-3 4.5 4.5 0 0 1 8 3c0 6-8 11-8 11z"/>',
+ send:'<path d="M21 3L3 10l7 3 3 7zM10 13l11-10"/>',
+ cup:'<path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2M8 3v2M11 3v2"/>',
+ out:'<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
+ dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/><circle cx="9" cy="10.5" r=".6"/><circle cx="12" cy="10.5" r=".6"/><circle cx="15" cy="10.5" r=".6"/>'
+};
+const ic=(n,c)=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"${c?` style="color:${c}"`:''}>${P[n]}</svg>`;
+
+/* ---------- date dinamiche (gli esempi seguono la data di oggi) ---------- */
+const DAY=864e5, now=new Date(); now.setHours(12,0,0,0);
+const add=n=>new Date(now.getTime()+n*DAY);
+const fmt=(d,o,loc)=>d.toLocaleDateString(loc||'en-GB',o);
+const shortDate=d=>fmt(d,{weekday:'short'})+' '+d.getDate()+' '+fmt(d,{month:'short'});   // Sat 17 Oct
+const dm=d=>fmt(d,{day:'numeric',month:'short'});                          // 22 Oct
+const tomorrow=add(1);
+
+/* ---------- template schermate ---------- */
+const DN=['S','M','T','W','T','F','S'];
+function week(){const s=add(-now.getDay());let h=DN.map(x=>`<b>${x}</b>`).join('');
+  for(let i=0;i<7;i++){const d=new Date(s.getTime()+i*DAY);const c=[];
+    if(d.toDateString()===now.toDateString())c.push('today');
+    if(d.toDateString()===tomorrow.toDateString())c.push('has');
+    const hd=d.toDateString()===holdDay.toDateString();
+    h+=`<span class="d ${c.join(' ')}"${hd?' data-t="wday"':''}>${d.getDate()}</span>`}
+  return `<div class="week">${h}</div>`}
+const DOW=6-now.getDay(); const holdDay=add(DOW===0?0:DOW);
+const dayLab=d=>d.toDateString()===now.toDateString()?'Today':d.toDateString()===tomorrow.toDateString()?'Tomorrow':shortDate(d);
+const notesBase=`<li>Call the dentist</li><li class="hi">Pay the car tax <span class="tg">#car</span></li><li>Pick up the dry cleaning</li><li>Book the summer holiday <span class="tg">#home</span></li>`;
+function home(o){o=o||{};return `
+<div class="scr" data-s="home">
+ <div class="hdr"><div class="pill" data-t="listview">${ic('list')} List view</div><div class="sq">${ic('dots')}</div></div>
+ <div class="lbl">CALENDAR <span class="lnk" data-t="openmonth">Open month ›</span></div>
+ ${week()}
+ <div class="lbl">NOTES</div>
+ <ul class="n">
+  ${o.dayNote?`<li class="x" data-t="newday"><span><span class="dt">${dayLab(holdDay)},</span>Call grandma</span></li>`:''}
+  ${o.freshMilk?`<li class="x" data-t="newnote"><span><span class="dt">Tomorrow,</span>Buy the milk${o.groceries?' <span class="tg">#groceries</span>':''}</span></li>`:'<li><span><span class="dt">Tomorrow,</span>Buy the milk</span></li>'}
+  ${o.wake?`<li class="x hi" data-t="newnote2"><span><span class="dt">${shortDate(add(8))},</span>Wake up 😅 <span class="tg">#home</span></span></li>`:''}
+  ${notesBase}
+ </ul>
+ <div class="lbl">QUICK REMINDERS</div>
+ ${o.remFresh?`<ul class="r"><li>${ic('note')} Locker 27</li><li class="x" data-t="rnew1">${ic('note')} Gate code 451</li><li class="x" data-t="rnew2">${ic('note')} Parking level B spot 12</li></ul>`:`<ul class="r"><li>${ic('note')} Gate code 451</li><li>${ic('note')} Parking level B spot 12</li></ul>`}
+ <div class="fab mic" data-t="fabmic">${ic('mic')}</div>
+ <div class="fab plus" data-t="fabplus">${ic('plus')}</div>
+</div>`}
+const voice=`
+<div class="scr voice" data-s="voice">
+ <div class="wave x on" data-t="wave"><span></span><span></span><span></span><span></span><span></span></div>
+ <div class="vt" data-t="vtitle">Speak now...</div>
+ <div class="field focus"><span data-t="vtext"></span><span class="ph" data-t="vph">Type or dictate: e.g. Buy milk tomorrow urgent</span><span class="caret"></span></div>
+ <div class="hint">Type it here, or dictate with the microphone</div>
+ <div class="prev x" data-t="prev">
+  <div class="k" data-t="pk">PREVIEW:</div>
+  <div class="row"><span data-t="pl">Title:</span><span data-t="pt"></span></div>
+  <div class="row" data-t="rp"><span>Priority:</span><span data-t="pp"></span></div>
+  <div class="row" data-t="rd"><span>Due date:</span><span data-t="pd" style="color:var(--a-cyan);display:flex;gap:4px;align-items:center"></span></div>
+  <div class="row" data-t="rr"><span>Repeat:</span><span data-t="pr" style="color:#c084fc;display:flex;gap:4px;align-items:center"></span></div>
+ </div>
+ <div class="btns"><div class="btn ghost">${ic('x')} Cancel</div><div class="btn lime off" data-t="add">${ic('check')} Add</div></div>
+</div>`;
+const bigmic=`<div class="dim x" data-t="dim"></div><div class="bigmic x" data-t="bigmic"><div class="b" data-t="bigmicbtn">${ic('mic')}</div><small>Tap outside to see your notes</small></div>`;
+const dialog=`<div class="dim x" data-t="ddim"></div>
+<div class="dlg x" data-t="dlg">
+ <h4>New task</h4><span class="close">${ic('x')}</span>
+ <div class="field focus" data-t="dtf"><span data-t="dtitle"></span><span class="ph" data-t="dph">What do you need to do?</span></div>
+ <div class="two"><div class="sel" data-t="dprio">${ic('flag')} <span class="dot" data-t="dpdot" style="background:var(--a-yellow)"></span><span data-t="dptxt">Medium</span></div>
+  <div class="sel" data-t="ddate">${ic('cal')} <span data-t="ddtxt" style="color:#566174">Due date</span></div></div>
+ <div class="tagrow"><div class="sel" data-t="dtag"><span data-t="dtagtxt" style="color:#566174">Add or search tags</span></div><div class="sel" style="justify-content:center">${ic('plus')}</div></div>
+ <span class="chip x" data-t="dchip">home ${ic('x')}</span>
+ <div class="sel" style="justify-content:space-between">${ic('rep')}<span>No repeat</span>${ic('chev')}</div>
+ <div class="btns"><div class="btn ghost">Cancel</div><div class="btn blue" data-t="dadd">${ic('plus')} Add</div></div>
+</div>`;
+function month(){
+ const y=now.getFullYear(),m=now.getMonth();const first=new Date(y,m,1);const days=new Date(y,m+1,0).getDate();
+ const target=tomorrow.getMonth()===m?tomorrow:now;const extra=[add(-12),add(-8),add(-11)];
+ let h=DN.map(x=>`<b>${x}</b>`).join('');for(let i=0;i<first.getDay();i++)h+='<span></span>';
+ for(let d=1;d<=days;d++){const dt=new Date(y,m,d);const c=[];
+  if(d===now.getDate())c.push('today');
+  if(d===target.getDate()||extra.some(e=>e.getMonth()===m&&e.getDate()===d))c.push('has');
+  h+=`<span class="d ${c.join(' ')}"${d===target.getDate()?' data-t="dsel"':''}>${d}</span>`}
+ const lab=target===tomorrow?'Tomorrow,':'Today,';
+ return `<div class="scr" data-s="month">
+ <div class="mhead"><div class="sq">${ic('back')}</div><div class="t">${fmt(now,{month:'long',year:'numeric'},'en-US')}</div><div class="today-b">Today</div></div>
+ <div class="mgrid">${h}</div><div class="legend">Days with notes</div>
+ <div class="x" data-t="dn"><div class="lbl">NOTES FOR ${fmt(target,{day:'numeric',month:'long'}).toUpperCase()}</div>
+  <ul class="n"><li data-t="dnote"><span class="tt"><span class="dt">${lab}</span>Buy the milk</span></li></ul>
+  <div class="acts x" data-t="acts"><span data-t="cmp" style="color:#4ade80">${ic('check')} Complete</span><span style="color:#cbd5e1">${ic('pen')} Edit</span><span style="color:var(--a-orange)">${ic('arch')} Archive</span><span style="color:#f87171">${ic('trash')} Delete</span></div>
+ </div></div>`}
+const list=`<div class="scr" data-s="list">
+ <div class="mhead"><div class="sq">${ic('back')}</div><div class="t">List</div><div class="sq">${ic('dots')}</div></div>
+ <div style="height:10px"></div>
+ <ul class="n">
+  <li class="od" data-t="diet"><span><span class="dt" data-t="dietdt">⚠️ 2 days ago,</span> Start a diet <span class="tg">#health</span></span>
+   <div class="acts collapse" data-t="dacts"><span style="color:#4ade80">${ic('check')} Complete</span><span data-t="post" style="color:var(--a-cyan)">${ic('right')} Tomorrow</span><span></span><span style="color:#cbd5e1">${ic('pen')} Edit</span><span style="color:var(--a-orange)">${ic('arch')} Archive</span><span style="color:#f87171">${ic('trash')} Delete</span></div></li>
+  <li class="od"><span><span class="dt">⚠️ 5 days ago,</span> Return the library books</span></li>
+  <li class="low"><span><span class="dt">Tomorrow${ic('rep')},</span> Water the plants <span class="tg">#home</span></span></li>
+  <li class="hi"><span><span class="dt">${shortDate(add(6))},</span> Pick up the car</span></li>
+  <li>Call the dentist</li>
+ </ul>
+ <div class="sect" style="color:var(--a-muted)"><span style="color:var(--a-orange)">${ic('note')}</span>REMINDERS (2)</div>
+ <ul class="r"><li>${ic('note')} Gate code 451</li><li>${ic('note')} Parking level B spot 12</li></ul>
+ <div class="sect"><span style="color:#4ade80">${ic('check')}</span>COMPLETED (2)</div>
+ <ul class="n"><li class="dn"><span><span class="dt">${shortDate(add(-4))},</span> Pay the car tax</span></li><li class="dn">Book the summer holiday</li></ul>
+</div>`;
+const warn=`<div class="warn x" data-t="warn">${ic('warn')} ⚠️ You have 2 overdue notes!</div>`;
+const settings=`<div class="scr" data-s="settings" style="padding:6px 14px 0">
+ <div class="shead"><div class="sq">${ic('back')}</div><div class="t">Settings</div><div class="save">${ic('check')} Save</div></div>
+ <div class="svp"><div class="sin" data-t="sin">
+  <div class="card"><div class="k">ACCOUNT</div><div class="acc"><div class="av">A</div><div class="m"><div>Alex Demo</div><div>alex.demo@example.com</div></div><div class="so">${ic('out')} Sign out</div></div></div>
+  <div class="card" data-t="improve"><div class="k">HELP ME IMPROVE</div>
+   <div class="pro"><div class="cup">${ic('cup')}</div><div style="flex:1">Support the app &amp; go Pro<small>Donations from €2 · Pro coming soon</small></div>${ic('right')}</div>
+   <div class="fbb" data-t="sendfb">${ic('chat')} Send feedback</div></div>
+  <div class="set"><div class="l">Theme</div><div class="dd">Dark ${ic('chev')}</div></div>
+  <div class="set" data-t="lang"><div class="l">Language</div><div class="dd">English (US) ${ic('chev')}</div><div class="sub">Applies to the app and to voice recognition</div></div>
+  <div class="set" data-t="open"><div class="l">When the app opens</div><div class="dd" data-t="opendd">Show the dictation button ${ic('chev')}</div>
+   <div class="ddm" data-t="ddm"><div>Show the dictation button ${ic('check')}</div><div>Start dictation right away</div><div>Just open the app</div></div></div>
+  <div class="card tg2"><div class="m">Warn about overdue notes<small>Show a warning on opening if there are overdue notes</small></div><span class="ck on"></span></div>
+  <div class="lbl" style="margin:6px 0 0">DUE DATE NOTIFICATIONS</div>
+  <div class="card tg2" data-t="notif"><div class="m">Remind me about due dates<small>One notification on the due day, even with the app closed</small></div><span class="ck on"></span></div>
+  <div class="card tg2"><div class="m">Reminder time<small>Applies to every note with a due date</small></div><div class="dd" style="padding:5px 8px;gap:6px">10:00 ${ic('chev')}</div></div>
+  <div class="lbl" style="margin:6px 0 0">VOICE SAVING</div>
+  <div class="card tg2" data-t="close"><div class="m">Closing word<small>"Save", "Add", "Done" (multilingual)</small></div><span class="ck on"></span></div>
+  <div class="card tg2" data-t="silence"><div class="m">Save after silence<small>Save automatically after a pause</small></div><span class="ck"></span></div>
+  <div class="lbl" style="margin:6px 0 0">BACKUP</div>
+  <div class="dd" data-t="export" style="justify-content:flex-start;gap:8px">${ic('dl')} Export notes (.xlsx)</div>
+  <div class="lbl" style="margin:6px 0 0">DANGER ZONE</div>
+  <div class="danger">${ic('trash')} Delete all completed notes</div>
+ </div></div></div>`;
+const feedback=`<div class="scr" data-s="fb" style="display:grid;grid-template-columns:minmax(0,1fr);gap:10px;align-content:start">
+ <div class="shead" style="padding-bottom:10px"><div style="color:var(--a-muted)">${ic('back')}</div><div class="t">Feedback</div></div>
+ <div style="color:#94a3b8">Your feedback helps us improve the app. Thanks for the time you give us!</div>
+ <div style="font-weight:600">Feedback type</div>
+ <div class="fbg"><div>${ic('bug','#f87171')}Bug / Problem</div><div data-t="fnew">${ic('bulb','#facc15')}New feature</div><div>${ic('star','#60a5fa')}Improvement</div><div>${ic('heart','#f472b6')}Appreciation</div></div>
+ <div style="font-weight:600">Message</div>
+ <div class="ta" data-t="fmsg"><span data-t="fmt"></span><span class="ph" data-t="fph">Describe your feedback...</span></div>
+ <div class="btn blue" data-t="fsend">${ic('send')} Send feedback</div>
+</div>`;
+const tagdlg=`<div class="dim x on" data-t="tdim"></div>
+<div class="tdlg x on" data-t="tdlg">
+ <h4>Manage tags</h4><span class="close" data-t="tclose">${ic('x')}</span>
+ <div class="tbox"><p>Create a new tag with keywords for voice recognition</p>
+  <div class="field" data-t="tn"><span data-t="tname"></span><span class="ph" data-t="tnph">Tag name (e.g. groceries)</span></div>
+  <div class="field" data-t="tk"><span data-t="tkw"></span><span class="ph" data-t="tkph">Keywords separated by commas</span></div>
+  <div class="btn blue" data-t="tcreate">${ic('plus')} Create tag</div></div>
+ <div class="k">EXISTING TAGS:</div>
+ <div class="titem x" data-t="tnew"><span class="dot" style="background:#10B981"></span><div>groceries<small>Keywords: buy, supermarket, shop</small></div>${ic('pen')}${ic('trash')}</div>
+ <div class="titem"><span class="dot" style="background:#06B6D4"></span><div>hobby<small>Keywords: free time, holiday</small></div>${ic('pen')}${ic('trash')}</div>
+ <div class="titem"><span class="dot" style="background:#7C3AED"></span><div>health</div>${ic('pen')}${ic('trash')}</div>
+ <div class="titem"><span class="dot" style="background:#2563EB"></span><div>home</div>${ic('pen')}${ic('trash')}</div>
+ <div class="tfoot">Example: create the tag "groceries" with keywords "buy, supermarket, shop".</div>
+</div>`;
+const frame=inner=>`<div class="screen"><div class="sb"><span>9:41</span><i></i></div>${inner}<div class="nav"></div></div>`;
+const BUILD={
+ voice:()=>frame(home({freshMilk:true})+bigmic+voice),
+ parser:()=>frame(voice),
+ reminders:()=>frame(home({remFresh:true})+voice),
+ tags:()=>frame(home({freshMilk:true,groceries:true})+tagdlg+voice),
+ dayhold:()=>frame(home({dayNote:true})+voice),
+ manual:()=>frame(home({wake:true})+dialog),
+ calendar:()=>frame(home()+month()),
+ overdue:()=>frame(home()+list+warn),
+ settings:()=>frame(settings),
+ feedback:()=>frame(settings+feedback)
+};
+
+/* ---------- motore animazioni ---------- */
+const RM=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const STOP={};
+class Run{
+ constructor(ph,fast){this.ph=ph;this.alive=true;this.fast=fast}
+ q(t){return this.ph.querySelector(`[data-t="${t}"]`)}
+ async wait(ms){if(!this.alive)throw STOP;if(this.fast)return;await new Promise(r=>setTimeout(r,ms));if(!this.alive)throw STOP}
+ go(s){this.ph.querySelectorAll('.scr').forEach(e=>e.classList.toggle('active',e.dataset.s===s))}
+ on(t){this.q(t).classList.add('on')}
+ off(t){this.q(t).classList.remove('on')}
+ async tap(t){const el=this.q(t);if(this.fast||!el)return;
+  const sc=this.ph.querySelector('.screen').getBoundingClientRect(),r=el.getBoundingClientRect();
+  const k=sc.width/this.ph.querySelector('.screen').offsetWidth||1;
+  const d=document.createElement('span');d.className='tap';d.style.left=((r.left-sc.left+r.width/2)/k)+'px';d.style.top=((r.top-sc.top+r.height/2)/k)+'px';
+  this.ph.querySelector('.screen').appendChild(d);el.classList.remove('press');void el.offsetWidth;el.classList.add('press');
+  await this.wait(420);d.remove()}
+ async type(t,text,ph,speed){const el=this.q(t);const chars=Array.from(text);
+  if(ph)this.q(ph).style.display='none';
+  if(this.fast){el.textContent=text;return}
+  for(let i=1;i<=chars.length;i++){el.textContent=chars.slice(0,i).join('');await this.wait(speed||60)}}
+ async hold(t){const el=this.q(t);if(this.fast||!el)return;
+  const sc=this.ph.querySelector('.screen').getBoundingClientRect(),r=el.getBoundingClientRect();
+  const k=sc.width/this.ph.querySelector('.screen').offsetWidth||1;
+  const d=document.createElement('span');d.className='hold';d.style.left=((r.left-sc.left+r.width/2)/k)+'px';d.style.top=((r.top-sc.top+r.height/2)/k)+'px';
+  this.ph.querySelector('.screen').appendChild(d);await this.wait(800);d.remove()}
+ vreset(){this.off('prev');this.q('vtext').textContent='';this.q('vph').style.display='';this.q('vtitle').textContent='Speak now...';this.on('wave');this.q('add').classList.add('off')}
+ async dictate(txt,o,speed){this.go('voice');await this.wait(700);await this.type('vtext',txt,'vph',speed||60);await this.wait(350);
+  this.q('vtitle').textContent='Add a note by voice';this.off('wave');preview(this,o);this.on('prev');this.q('add').classList.remove('off')}
+ scrollTo(t){const el=this.q(t),sin=this.q('sin');sin.style.transform=`translateY(-${Math.max(0,el.offsetTop-70)}px)`}
+ glow(t){const el=this.q(t);el.classList.remove('glow');void el.offsetWidth;el.classList.add('glow')}
+}
+const PRIO={h:['High','var(--a-red)','#f87171'],m:['Medium','var(--a-yellow)','#facc15'],l:['Low','var(--a-green)','#4ade80']};
+function preview(r,o){
+ const pv=r.q('prev');pv.classList.toggle('rem',!!o.rem);
+ r.q('pk').textContent=o.rem?'📝 REMINDER:':'PREVIEW:';r.q('pl').textContent=o.rem?'Note:':'Title:';
+ r.q('pt').textContent=o.title;r.q('pt').style.color=o.rem?'#fde68a':'';
+ r.q('rp').classList.toggle('hide',!!o.rem);
+ if(o.prio){const p=PRIO[o.prio];r.q('pp').innerHTML=`<span class="dot" style="background:${p[1]}"></span>${p[0]}`;r.q('pp').style.color=p[2]}
+ r.q('rd').classList.toggle('hide',!o.due);if(o.due)r.q('pd').innerHTML=ic('cal')+o.due;
+ r.q('rr').classList.toggle('hide',!o.rep);if(o.rep)r.q('pr').innerHTML=ic('rep')+o.rep;
+}
+const SCENES={
+ async voice(r){r.go('home');r.on('dim');r.on('bigmic');await r.wait(1300);await r.tap('bigmicbtn');
+  r.off('dim');r.off('bigmic');r.go('voice');await r.wait(1000);
+  await r.type('vtext','buy the milk tomorrow','vph',70);await r.wait(500);
+  r.q('vtitle').textContent='Add a note by voice';r.off('wave');
+  preview(r,{title:'Buy the milk',prio:'m',due:'Tomorrow'});r.on('prev');r.q('add').classList.remove('off');
+  await r.wait(1800);await r.tap('add');r.go('home');await r.wait(250);r.on('newnote');await r.wait(2200)},
+ async parser(r){r.go('voice');
+  const S=[
+   ['buy the milk tomorrow',{title:'Buy the milk',prio:'m',due:'Tomorrow'}],
+   ['pay the car tax in 3 days urgent',{title:'Pay the car tax',prio:'h',due:shortDate(add(3))}],
+   ['water the plants every week',{title:'Water the plants',prio:'m',rep:'Every week'}]];
+  for(const [txt,o] of S){
+   r.off('prev');r.q('vtext').textContent='';r.q('vtitle').textContent='Speak now...';r.on('wave');r.q('add').classList.add('off');
+   await r.wait(700);await r.type('vtext',txt,'vph',55);await r.wait(350);
+   r.q('vtitle').textContent='Add a note by voice';r.off('wave');preview(r,o);r.on('prev');r.q('add').classList.remove('off');
+   await r.wait(2400)}},
+ async manual(r){r.go('home');await r.wait(1000);await r.tap('fabplus');r.on('ddim');r.on('dlg');await r.wait(800);
+  await r.type('dtitle','Wake up 😅','dph',90);await r.wait(300);
+  await r.tap('dprio');r.q('dpdot').style.background='var(--a-red)';r.q('dptxt').textContent='High';await r.wait(500);
+  await r.tap('ddate');r.q('ddtxt').textContent=dm(add(8));r.q('ddtxt').style.color='';await r.wait(500);
+  await r.tap('dtag');r.q('dtagtxt').style.color='';await r.type('dtagtxt','home',null,90);await r.wait(300);
+  r.q('dtagtxt').textContent='Add or search tags';r.q('dtagtxt').style.color='#566174';r.on('dchip');await r.wait(700);
+  await r.tap('dadd');r.off('dlg');r.off('ddim');await r.wait(300);r.on('newnote2');await r.wait(2200)},
+ async calendar(r){r.go('home');await r.wait(1000);await r.tap('openmonth');r.go('month');await r.wait(900);
+  await r.tap('dsel');r.q('dsel').classList.add('pickd');r.on('dn');await r.wait(900);
+  await r.tap('dnote');r.on('acts');await r.wait(1100);await r.tap('cmp');r.q('dnote').classList.add('done');r.q('dnote').style.setProperty('--x','1');await r.wait(2000)},
+ async reminders(r){r.go('home');await r.wait(1000);
+  for(const [txt,title,t] of [['remember gate code 451','Gate code 451','rnew1'],['remember parking level B spot 12','Parking level B spot 12','rnew2']]){
+   await r.tap('fabmic');r.vreset();await r.dictate(txt,{title,rem:true},55);await r.wait(1700);
+   await r.tap('add');r.go('home');await r.wait(250);r.on(t);await r.wait(1500)}
+  await r.wait(800)},
+ async tags(r){r.go('home');await r.wait(900);
+  await r.tap('tn');r.q('tn').classList.add('focus');await r.type('tname','groceries','tnph',80);r.q('tn').classList.remove('focus');
+  await r.tap('tk');r.q('tk').classList.add('focus');await r.type('tkw','buy, supermarket, shop','tkph',50);r.q('tk').classList.remove('focus');await r.wait(300);
+  await r.tap('tcreate');r.q('tname').textContent='';r.q('tnph').style.display='';r.q('tkw').textContent='';r.q('tkph').style.display='';r.on('tnew');await r.wait(1800);
+  await r.tap('tclose');r.off('tdlg');r.off('tdim');await r.wait(700);
+  await r.tap('fabmic');r.vreset();await r.dictate('buy the milk tomorrow',{title:'Buy the milk',prio:'m',due:'Tomorrow'},60);await r.wait(1500);
+  await r.tap('add');r.go('home');await r.wait(250);r.on('newnote');await r.wait(2400)},
+ async dayhold(r){r.go('home');await r.wait(1100);await r.hold('wday');r.vreset();
+  await r.dictate('call grandma',{title:'Call grandma',prio:'m',due:dayLab(holdDay)},75);await r.wait(1600);
+  await r.tap('add');r.go('home');await r.wait(250);r.q('wday').classList.add('has');r.on('newday');await r.wait(2400)},
+ async overdue(r){r.go('home');await r.wait(500);r.on('warn');await r.wait(2000);r.off('warn');await r.wait(400);
+  await r.tap('listview');r.go('list');await r.wait(1500);
+  await r.tap('diet');r.on('dacts');await r.wait(1300);await r.tap('post');r.off('dacts');
+  const dt=r.q('dietdt');dt.classList.add('flip');await r.wait(300);dt.textContent='Tomorrow,';
+  r.q('diet').classList.remove('od');r.q('diet').classList.add('saved');await r.wait(2800)},
+ async settings(r){r.go('settings');await r.wait(1400);
+  r.scrollTo('lang');await r.wait(1000);r.glow('lang');await r.wait(1300);
+  await r.tap('opendd');r.q('ddm').classList.add('on');await r.wait(1700);r.q('ddm').classList.remove('on');await r.wait(300);
+  r.scrollTo('notif');await r.wait(1000);r.glow('notif');await r.wait(1500);
+  r.scrollTo('close');await r.wait(1000);r.glow('close');await r.wait(900);r.glow('silence');await r.wait(1400);
+  r.scrollTo('export');await r.wait(1000);r.glow('export');await r.wait(1800)},
+ async feedback(r){r.go('settings');await r.wait(900);await r.tap('sendfb');r.go('fb');await r.wait(800);
+  await r.tap('fnew');r.q('fnew').classList.add('pick');await r.wait(500);await r.tap('fmsg');
+  await r.type('fmt','A home screen widget would be great!','fph',45);await r.wait(600);await r.tap('fsend');await r.wait(1800)}
+};
+
+const phones=[...document.querySelectorAll('.phone')];
+const T={it:['Pausa','Riproduci'],en:['Pause','Play']};
+function updCtrl(b){const ph=b._ph;const l=root.dataset.lang||'it';b.textContent=(ph._paused?'▶ '+T[l][1]:'❚❚ '+T[l][0])}
+function start(ph){stop(ph);const r=new Run(ph,RM);ph._run=r;
+ (async()=>{while(r.alive){ph.innerHTML=ph._init;
+  try{await SCENES[ph.dataset.scene](r);if(r.fast)return;await r.wait(1500)}catch(e){if(e!==STOP)console.error(e);return}}})()}
+function stop(ph){if(ph._run){ph._run.alive=false;ph._run=null}}
+phones.forEach(ph=>{
+ ph._init=BUILD[ph.dataset.scene]();ph.innerHTML=ph._init;
+ ph.querySelector('.scr').classList.add('active');
+ ph.setAttribute('role','img');ph.setAttribute('aria-label','Demo animata / Animated demo');
+ if(!RM){const b=document.createElement('button');b.type='button';b.className='ctrl';b._ph=ph;
+  b.addEventListener('click',()=>{ph._paused=!ph._paused;if(ph._paused)stop(ph);else start(ph);updCtrl(b)});
+  ph.after(b);ph._btn=b}
+});
+if(RM){phones.forEach(start)}
+else if('IntersectionObserver' in window){
+ const io=new IntersectionObserver(es=>es.forEach(e=>{const ph=e.target;
+  if(e.isIntersecting){if(!ph._run&&!ph._paused)start(ph)}else stop(ph)}),{threshold:.35});
+ phones.forEach(ph=>io.observe(ph));
+}else phones.forEach(start);
+function fitPhones(){const st=document.querySelector('.stage');if(!st)return;
+ const w=st.clientWidth;const z=window.innerWidth<=760?Math.max(1,Math.min(1.45,w/272)):1;
+ phones.forEach(ph=>{ph.style.zoom=z===1?'':String(z)})}
+fitPhones();window.addEventListener('resize',fitPhones);
+setLang(L==='en'?'en':'it');
+})();
+</script>
+
+</body>
+</html>
