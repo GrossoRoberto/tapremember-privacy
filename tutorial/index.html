@@ -581,8 +581,8 @@ ul.r li.x{display:none}ul.r li.x.on{display:flex;animation:pop .8s}
         </div>
         <div class="box">
           <h3>Free · Pro</h3>
-          <p lang="it">La versione gratuita arriva a <b>50 note attive</b> e <b>5 tag</b>. Pro li renderà illimitati.</p>
-          <p lang="en">The free version allows <b>50 active notes</b> and <b>5 tags</b>. Pro will make them unlimited.</p>
+          <p lang="it">TapRemember è gratuito. Il Pro, con funzioni in più, è in arrivo.</p>
+          <p lang="en">TapRemember is free. Pro, with extra features, is coming soon.</p>
           <div class="price">2,99 € <span class="ver" style="vertical-align:middle;border:1px solid var(--line);border-radius:999px;padding:2px 9px"><span lang="it">In arrivo</span><span lang="en">Coming soon</span></span></div>
           <p lang="it">una volta sola, nessun abbonamento. Lo sblocco Pro <b>è in arrivo</b>: per ora in Impostazioni → <b>Sostieni l'app e passa a Pro</b> trovi le donazioni (da 2 €).</p>
           <p lang="en">once, no subscription. The Pro unlock is <b>coming soon</b>: for now, Settings → <b>Support the app &amp; go Pro</b> has donations (from €2).</p>
@@ -622,8 +622,11 @@ function setLang(l){root.dataset.lang=l;root.lang=l;
   try{localStorage.setItem('tr-help-lang',l)}catch(e){}
   document.querySelectorAll('.ctrl').forEach(updCtrl);}
 let L='it';
-try{L=localStorage.getItem('tr-help-lang')||''}catch(e){L=''}
-if(!L){L=(navigator.language||'it').toLowerCase().startsWith('it')?'it':'en'}
+/* lingua passata dall'app (?lang=it|en|es|fr|de): vince su tutto; lingue non ancora tradotte -> inglese */
+let Q='';try{Q=(new URLSearchParams(location.search).get('lang')||'').toLowerCase().slice(0,2)}catch(e){Q=''}
+if(Q){L=Q}else{try{L=localStorage.getItem('tr-help-lang')||''}catch(e){L=''}
+if(!L){L=(navigator.language||'it').toLowerCase().startsWith('it')?'it':'en'}}
+if(L!=='it'&&L!=='en')L='en';
 document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
 
 /* ---------- icone ---------- */
