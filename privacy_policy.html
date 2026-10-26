@@ -24,7 +24,7 @@
 
 <h1>Privacy Policy — TapRemember</h1>
 
-<p><strong>Last updated:</strong> October 17, 2026</p>
+<p><strong>Last updated:</strong> October 26, 2026</p>
 
 <p>TapRemember ("we", "our", or "the app") is a voice note application developed by Roberto Grosso (RGR Tools, <a href="mailto:nuke.coba@gmail.com">nuke.coba@gmail.com</a>). This Privacy Policy explains what data we collect, how we use it, who we share it with, and your rights as a user. By using TapRemember, you agree to this policy.</p>
 
@@ -39,7 +39,7 @@
 <h3>Notes data</h3>
 <ul>
   <li><strong>Guest users:</strong> notes and tags are stored only on your device, in the app's local storage. No note data is transmitted to any server.</li>
-  <li><strong>Signed-in users:</strong> notes and tags are stored in Google Firebase Firestore under your unique user ID, so they sync across your devices.</li>
+  <li><strong>Signed-in users:</strong> notes and tags are stored in Google Firebase Firestore under your unique user ID, so they sync across your devices. To let the app work without a connection, a copy of your notes and tags is also kept on your device, in the app's private storage. Changes you make offline are sent to Firestore when the connection returns. This local copy is deleted when you sign out.</li>
 </ul>
 
 <h3>Notifications</h3>
@@ -57,7 +57,7 @@
   <li>Platform identifier ("android") and app version</li>
 </ul>
 <p>Some earlier versions of the app also had an optional email field in the feedback form. If you filled it in, that address is stored with your feedback. You can ask us to delete it at any time (see section 7).</p>
-<p>If we need to reply to your feedback, we may write to the email address of your Google account. We use it only for that reply. If sending fails (for example, without a connection), your feedback stays only on your device and is not sent.</p>
+<p>If we need to reply to your feedback, we may write to the email address of your Google account. We use it only for that reply. If sending fails (for example, without a connection), the app tells you and keeps your text in the form so you can try again; no copy is stored on your device.</p>
 
 <h3>Donations and in-app purchases</h3>
 <p>You can support the app with optional donations. These, and any future in-app purchases, are processed entirely by Google Play. We receive only the purchase confirmation needed to complete the transaction; we never receive or store your payment details.</p>
@@ -80,7 +80,7 @@
 </ul>
 
 <h2>4. Data Retention</h2>
-<p>Notes and tags stored in Firestore are kept until you delete them in the app or ask us to delete your account. Guest data stays on your device until you clear the app's storage in Android settings or uninstall the app.</p>
+<p>Notes and tags stored in Firestore are kept until you delete them in the app or ask us to delete your account. For signed-in users, the offline copy on your device is deleted when you sign out; it is also removed if you clear the app's storage in Android settings or uninstall the app. If you sign out while offline, changes not yet sent to Firestore are lost. Guest data stays on your device until you clear the app's storage in Android settings or uninstall the app.</p>
 <p>Feedback is kept to help us improve the app, until you ask us to delete it. Each feedback entry is linked to the sender's Firebase user ID.</p>
 
 <h2>5. Security</h2>
